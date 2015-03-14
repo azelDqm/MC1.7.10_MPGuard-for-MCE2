@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import mpGuard.EnumMPGuard;
 import mpGuard.MPGuardMain;
+import mpGuard.enums.EnumMPGuard;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -62,7 +62,7 @@ public class PlayerDataHandler {
 	        					  MPGuardMain.conf.cfgLostMode.getInt(1) == EnumMPGuard.RandomItem.Mode()))
 	        	{
 	        		//アイテムロストの場合 アイテムを落とす
-	                ItemStack fukuro = new ItemStack(MPGuardMain.ItemMPFukuro, 1);
+	                ItemStack fukuro = new ItemStack(MPGuardMain.items.ItemMPFukuro, 1);
 
 	                NBTTagCompound nbt = fukuro.getTagCompound();
 	                if(nbt ==null)
@@ -86,14 +86,47 @@ public class PlayerDataHandler {
     /*ワールドに入った時に呼ばれるイベント。ここでIExtendedEntityPropertiesを読み込む処理を呼び出す*/
     public void onEntityJoinWorld(EntityJoinWorldEvent event)  {
         if (!event.entity.worldObj.isRemote && event.entity instanceof EntityPlayer) {
-            NBTTagCompound playerData = getEntityData(event.entity.getCommandSenderName());
-            if (playerData != null) {
-                (event.entity.getExtendedProperties(ExtendedPlayerProperties.EXT_PROP_NAME)).loadNBTData(playerData);
-            }
-            ((ExtendedPlayerProperties)(event.entity.getExtendedProperties(ExtendedPlayerProperties.EXT_PROP_NAME))).loadProxyData((EntityPlayer)event.entity);
-            EntityPlayer ep = (EntityPlayer)event.entity;
-            MCEconomyAPI.addPlayerMP(ep, ExtendedPlayerProperties.get(ep).getPlayerMP(), false);
-            ExtendedPlayerProperties.get(ep).setPlayerMP(0);
+        	EntityPlayer ep = (EntityPlayer)event.entity;
+
+        	if(!ep.isDead && ep.getHealth() > 0)
+        	{
+	            NBTTagCompound playerData = getEntityData(event.entity.getCommandSenderName());
+	            if (playerData != null) {
+	                (event.entity.getExtendedProperties(ExtendedPlayerProperties.EXT_PROP_NAME)).loadNBTData(playerData);
+	            }
+	            ((ExtendedPlayerProperties)(event.entity.getExtendedProperties(ExtendedPlayerProperties.EXT_PROP_NAME))).loadProxyData((EntityPlayer)event.entity);
+	            MCEconomyAPI.addPlayerMP(ep, ExtendedPlayerProperties.get(ep).getPlayerMP(), false);
+	            ExtendedPlayerProperties.get(ep).setPlayerMP(0);
+        	}else
+        	{
+            	if(MPGuardMain.conf.cfgLostMode.getInt(1) != 0)
+            	{
+            		int lostMP = MCEconomyAPI.getPlayerMP(ep);
+            		int itemMP = 0;
+    	        	if(MPGuardMain.conf.cfgLostMode.getInt(1) == EnumMPGuard.ItemLost.Mode())
+    	        	{
+    	        		//アイテムロストの場合
+    	        		itemMP = lostMP;
+    	        		lostMP = 0;
+
+    	        	}else if(MPGuardMain.conf.cfgLostMode.getInt(1) == EnumMPGuard.RandomLost.Mode() ||
+    	        			 MPGuardMain.conf.cfgLostMode.getInt(1) == EnumMPGuard.RandomItem.Mode())
+    	        	{
+    	        		//ランダムロストの場合
+    	        		Random rand = new Random();
+    	        		int lostPer = rand.nextInt(MPGuardMain.conf.cfgLostPercent.getInt(50) + 1);
+    	        		itemMP = lostMP * lostPer / 100;
+    	        		lostMP = lostMP - itemMP;
+    	        	}
+
+    	        	//ロスト予定分をプレイヤーデータに格納
+    	        	ExtendedPlayerProperties.get(ep).setPlayerMP(lostMP);
+            	}
+
+        		NBTTagCompound playerData = new NBTTagCompound();
+                (event.entity.getExtendedProperties(ExtendedPlayerProperties.EXT_PROP_NAME)).saveNBTData(playerData);
+                storeEntityData(event.entity.getCommandSenderName(), playerData);
+        	}
         }
     }
 

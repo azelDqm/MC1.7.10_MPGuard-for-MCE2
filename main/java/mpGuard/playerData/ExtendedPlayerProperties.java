@@ -13,6 +13,7 @@ public class ExtendedPlayerProperties implements IExtendedEntityProperties {
     public final static String EXT_PROP_NAME = "MCEBankPlayerData";
 
     private int playerMP;
+    private int fukuroSetMP;
 
 
     /*EntityPlayerインスタンスから外部保存時の固有文字列を返す
@@ -36,6 +37,7 @@ public class ExtendedPlayerProperties implements IExtendedEntityProperties {
         NBTTagCompound nbt = new NBTTagCompound();
 
         nbt.setInteger("playerMP", this.playerMP);
+        nbt.setInteger("fukuroSetMP", this.fukuroSetMP);
 
         compound.setTag(EXT_PROP_NAME, nbt);
     }
@@ -45,6 +47,7 @@ public class ExtendedPlayerProperties implements IExtendedEntityProperties {
         NBTTagCompound nbt = (NBTTagCompound)compound.getTag(EXT_PROP_NAME);
 
         this.playerMP = nbt.getInteger("playerMP");
+        this.fukuroSetMP = nbt.getInteger("fukuroSetMP");
 
     }
 
@@ -69,6 +72,13 @@ public class ExtendedPlayerProperties implements IExtendedEntityProperties {
     }
     public void setPlayerMP(int par1) {
         this.playerMP = par1;
+    }
+
+    public int getFukuroSetMP() {
+        return fukuroSetMP;
+    }
+    public void setFukuroSetMP(int par1) {
+        this.fukuroSetMP = par1;
     }
 
 }

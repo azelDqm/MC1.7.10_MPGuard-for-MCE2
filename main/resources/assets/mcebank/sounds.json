@@ -1,0 +1,14 @@
+{
+  "player.mpin": {
+    "category":"player",
+    "sounds": [
+      {
+        "name": "player/System37",
+        "stream": false,
+        "weight": 1,
+        "volume": 1,
+        "pitch": 1
+      }
+    ]
+  }
+}

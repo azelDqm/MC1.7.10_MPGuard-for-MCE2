@@ -1,0 +1,15 @@
+[
+{
+  "modid": "MPGuard",
+  "name": "MPGuardForMCEconomy2",
+  "description": "MP lost guard for MCEconomy2",
+  "version": "1.1.0",
+  "mcversion": "1.7.10",
+  "url": "http://forum.minecraftuser.jp/viewtopic.php?f=13&t=20606",
+  "authorList": ["Azel"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
